@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using ED.SC;
+using Mono.Cecil;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
@@ -61,6 +62,8 @@ public class AvatarController : NetworkBehaviour {
         // RPC calling executes the method in several clients (specified by RpcTarget)
         // if (Input.GetKeyDown(KeyCode.RightControl)) m_Color.Value = m_Colors[2];
         if (Input.GetKeyDown(KeyCode.RightControl)) SpawnDoorServerRpc();
+
+        if(Input.GetKeyDown(KeyCode.T)) TestClientRpc();
     }
 
     void LerpPosition(Vector3 offset, float speed) {
@@ -72,19 +75,23 @@ public class AvatarController : NetworkBehaviour {
     [Rpc(SendTo.Server)]
     void SpawnDoorServerRpc()
     {
-        TestServerRpc();
         SmartConsole.Log("spawn door");
         GameObject door = Instantiate(doorPrefab, m_Position.Value, Quaternion.identity);
         m_Position.Value += Vector3.right + Vector3.up;
         door.GetComponent<NetworkObject>().Spawn();
     }
 
-    [ServerRpc]
-    void TestServerRpc()
+    [Rpc(SendTo.Server)]
+    void TestServerRpc(ServerRpcParams serverRpcParams)
     {
-        SmartConsole.Log("TestServerRpc " + OwnerClientId);
+        SmartConsole.Log("TestServerRpc " + OwnerClientId + "," + serverRpcParams.Receive.SenderClientId);
     }
 
+    [ClientRpc]
+    private void TestClientRpc()
+    {
+        SmartConsole.Log("TestClientRpc");
+    }
     
     // [ServerRpc(RequireOwnership = false)]
     // void ChangeColorServerRpc(Color newColor)
