@@ -22,7 +22,7 @@ public class AvatarController : NetworkBehaviour {
     void Start()
     {
         SmartConsole.Log($"ClientId {OwnerClientId}");
-        if (OwnerClientId > 2)
+        if (OwnerClientId > 3)
         {
             NetworkManager.Singleton.DisconnectClient(OwnerClientId);
             Destroy(gameObject);
@@ -82,6 +82,12 @@ public class AvatarController : NetworkBehaviour {
         GameObject door = Instantiate(doorPrefab, m_Position.Value, Quaternion.identity);
         m_Position.Value += Vector3.right + Vector3.up;
         door.GetComponent<NetworkObject>().Spawn();
+    }
+
+    [Rpc(SendTo.Server)]
+    void hoverControllerServerRpc()
+    {
+
     }
 
     [ServerRpc]
